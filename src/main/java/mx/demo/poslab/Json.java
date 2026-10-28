@@ -9,10 +9,10 @@ final class Json {
     static final Gson GSON = new GsonBuilder().setPrettyPrinting().serializeNulls().disableHtmlEscaping().create();
     static void write(Path path, Object object) throws IOException {
         if (path.toAbsolutePath().getParent() != null) Files.createDirectories(path.toAbsolutePath().getParent());
-        Files.writeString(path, GSON.toJson(object), StandardCharsets.UTF_8);
+        Compat.write(path, GSON.toJson(object));
     }
     static Model.Snapshot read(Path path) throws IOException {
-        Model.Snapshot s = GSON.fromJson(Files.readString(path, StandardCharsets.UTF_8), Model.Snapshot.class);
+        Model.Snapshot s = GSON.fromJson(Compat.read(path), Model.Snapshot.class);
         if (s == null || s.schemaVersion != 1 || s.nodes == null || s.apps == null || s.warnings == null)
             throw new IOException("Formato de snapshot inválido: " + path);
         return s;

@@ -14,32 +14,32 @@ public final class Main {
         catch (Exception e) { System.err.println("Error: " + e.getMessage()); System.exit(2); }
     }
     static int run(Options o) throws Exception {
-        if (Set.of("help", "--help", "-h").contains(o.command)) { help(); return 0; }
+        if (Compat.set("help", "--help", "-h").contains(o.command)) { help(); return 0; }
         if (o.command.equals("internal-jna")) {
-            Snapshot s = NativeProbe.capture(o); Json.write(Path.of(o.get("result", "native-result.json")), s); return s.ok ? 0 : 2;
+            Snapshot s = NativeProbe.capture(o); Json.write(java.nio.file.Paths.get(o.get("result", "native-result.json")), s); return s.ok ? 0 : 2;
         }
-        if (!Set.of("doctor", "list", "inspect", "suite", "find", "check", "watch", "diff").contains(o.command))
+        if (!Compat.set("doctor", "list", "inspect", "suite", "find", "check", "watch", "diff").contains(o.command))
             throw new IllegalArgumentException("Comando desconocido: " + o.command);
-        if (Set.of("inspect", "suite", "find", "check", "watch").contains(o.command)) o.requireTarget();
+        if (Compat.set("inspect", "suite", "find", "check", "watch").contains(o.command)) o.requireTarget();
         String backend = o.get("backend", o.command.equals("suite") || o.command.equals("doctor") ? "both" : "jna");
-        if (backend.equals("both") && !Set.of("suite", "doctor", "list").contains(o.command))
+        if (backend.equals("both") && !Compat.set("suite", "doctor", "list").contains(o.command))
             throw new IllegalArgumentException("Usa --backend jna o python para este comando");
         if (o.command.equals("check")) {
             // Validar la expresión antes de leer aplicaciones.
             Analysis.check(Snapshot.failure("", ""), o);
         }
-        Path out = Path.of(o.get("out", "reports/" + Instant.now().toString().replaceAll("[:.]", "-"))).toAbsolutePath();
+        Path out = java.nio.file.Paths.get(o.get("out", "reports/" + Instant.now().toString().replaceAll("[:.]", "-"))).toAbsolutePath();
         Files.createDirectories(out);
-        List<String> backends = backend.equals("both") ? List.of("jna", "python") : List.of(backend);
+        List<String> backends = backend.equals("both") ? Compat.list("jna", "python") : Compat.list(backend);
         List<Snapshot> snapshots = new ArrayList<>();
         String notes;
         if (o.command.equals("diff")) {
             if (!o.has("before") || !o.has("after")) throw new IllegalArgumentException("diff requiere --before y --after");
-            Snapshot a = Json.read(Path.of(o.get("before", ""))), b = Json.read(Path.of(o.get("after", "")));
+            Snapshot a = Json.read(java.nio.file.Paths.get(o.get("before", ""))), b = Json.read(java.nio.file.Paths.get(o.get("after", "")));
             if (!a.ok || !b.ok) throw new IllegalArgumentException("No se comparan capturas fallidas; revisa primero sus errores");
             List<Map<String, Object>> changes = Analysis.diff(a, b); Json.write(out.resolve("changes.json"), changes);
             notes = "Cambios observados: " + changes.size() + ". Comparación por ruta posicional; una reordenación puede parecer un cambio. No son IDs permanentes. Capturas parciales requieren revisión.";
-            snapshots.addAll(List.of(a, b));
+            snapshots.addAll(Compat.list(a, b));
         } else if (o.command.equals("doctor")) {
             Json.write(out.resolve("environment.json"), environment());
             notes = "Revisión de entorno y enumeración del registro. Un registro vacío NO demuestra incompatibilidad. Abre el control GTK y el POS en la misma sesión y vuelve a probar.";
@@ -97,7 +97,7 @@ public final class Main {
         if (o.command.equals("check")) return Analysis.check(snapshots.get(0), o).passed() ? 0 : 3;
         if (snapshots.stream().noneMatch(s -> s.ok)) return 2;
         if (o.command.equals("find")) return !Analysis.select(snapshots.get(0), o).isEmpty() ? 0 : 3;
-        if (Set.of("list", "doctor", "diff").contains(o.command)) return 0;
+        if (Compat.set("list", "doctor", "diff").contains(o.command)) return 0;
         return snapshots.stream().anyMatch(s -> "ELEMENTOS_LEIBLES".equals(Analysis.summary(s).get("veredicto"))) ? 0 : 4;
     }
     private static Snapshot capture(String backend, Options o, Path out, String stem, boolean list) throws Exception {
@@ -110,36 +110,34 @@ public final class Main {
         env.put("os", System.getProperty("os.name")); env.put("osVersion", System.getProperty("os.version"));
         env.put("arch", System.getProperty("os.arch")); env.put("java", System.getProperty("java.version"));
         env.put("awtHeadless", GraphicsEnvironment.isHeadless());
-        for (String key : List.of("DISPLAY", "WAYLAND_DISPLAY", "DBUS_SESSION_BUS_ADDRESS", "AT_SPI_BUS_ADDRESS", "XDG_RUNTIME_DIR"))
-            env.put(key + "_present", System.getenv(key) != null && !System.getenv(key).isBlank());
-        for (String key : List.of("XDG_SESSION_TYPE", "XDG_CURRENT_DESKTOP", "NO_AT_BRIDGE", "GTK_MODULES", "QT_ACCESSIBILITY", "QT_LINUX_ACCESSIBILITY_ALWAYS_ON"))
+        for (String key : Compat.list("DISPLAY", "WAYLAND_DISPLAY", "DBUS_SESSION_BUS_ADDRESS", "AT_SPI_BUS_ADDRESS", "XDG_RUNTIME_DIR"))
+            env.put(key + "_present", System.getenv(key) != null && !Compat.blank(System.getenv(key)));
+        for (String key : Compat.list("XDG_SESSION_TYPE", "XDG_CURRENT_DESKTOP", "NO_AT_BRIDGE", "GTK_MODULES", "QT_ACCESSIBILITY", "QT_LINUX_ACCESSIBILITY_ALWAYS_ON"))
             env.put(key, System.getenv(key));
         env.put("nota", "AWT headless no determina la disponibilidad de AT-SPI. Wayland no implica por sí mismo que no se puedan leer elementos.");
         return env;
     }
     private static void help() {
-        System.out.println("""
-                POS Accessibility Lab · Java 17+ · sólo lectura
-                Uso: bash run.sh COMANDO [--opción valor ...]
-                  doctor                         Entorno + prueba del registro con ambas vías
-                  list [--backend both]          Nombres, PID y toolkit de aplicaciones
-                  suite --app NOMBRE             Dos lecturas por vía, reporte comparativo
-                  inspect --pid PID              Árbol, nombres, textos, valores y estados
-                  find --pid PID --name Total    Busca elementos en una captura nueva
-                  check --pid PID --id total --field text --equals '125.50'
-                  watch --pid PID --samples 3 --interval 5000
-                  diff --before A.json --after B.json
-
-                Selección: --app subcadena (no regex) y/o --pid entero
-                Lectores: --backend jna|python; both sólo en doctor/list/suite
-                Filtros find/check: --name, --role, --text (subcadena sin mayúsculas),
-                  --id, --path (exactos). check exige un único elemento/aplicación,
-                  --field text|name|value y exactamente --equals o --contains (sensibles a mayúsculas).
-                Límites: --max-nodes 2000 --max-depth 25 --max-text 2000 --timeout 45
-                Salida: --out CARPETA; Python: --python /usr/bin/python3
-                Salidas 0=lectura/operación satisfactoria, 2=uso/infraestructura,
-                  3=búsqueda/validación fallida, 4=diagnóstico parcial o no concluyente.
-                Ver README.md para instalación, control GTK y cómo interpretar resultados.
-                """);
+        System.out.println("POS Accessibility Lab 1.1.0 · Java 8 (1.8)+ · sólo lectura\n"
+                + "Uso: bash run.sh COMANDO [--opción valor ...]\n"
+                + "  doctor                         Entorno + prueba del registro con ambas vías\n"
+                + "  list [--backend both]          Nombres, PID y toolkit de aplicaciones\n"
+                + "  suite --app NOMBRE             Dos lecturas por vía, reporte comparativo\n"
+                + "  inspect --pid PID              Árbol, nombres, textos, valores y estados\n"
+                + "  find --pid PID --name Total    Busca elementos en una captura nueva\n"
+                + "  check --pid PID --id total --field text --equals '125.50'\n"
+                + "  watch --pid PID --samples 3 --interval 5000\n"
+                + "  diff --before A.json --after B.json\n"
+                + "\n"
+                + "Selección: --app subcadena (no regex) y/o --pid entero\n"
+                + "Lectores: --backend jna|python; both sólo en doctor/list/suite\n"
+                + "Filtros find/check: --name, --role, --text (subcadena sin mayúsculas),\n"
+                + "  --id, --path (exactos). check exige un único elemento/aplicación,\n"
+                + "  --field text|name|value y exactamente --equals o --contains (sensibles a mayúsculas).\n"
+                + "Límites: --max-nodes 2000 --max-depth 25 --max-text 2000 --timeout 45\n"
+                + "Salida: --out CARPETA; Python: --python /usr/bin/python3\n"
+                + "Salidas 0=lectura/operación satisfactoria, 2=uso/infraestructura,\n"
+                + "  3=búsqueda/validación fallida, 4=diagnóstico parcial o no concluyente.\n"
+                + "Ver README.md para instalación, control GTK y cómo interpretar resultados.\n");
     }
 }

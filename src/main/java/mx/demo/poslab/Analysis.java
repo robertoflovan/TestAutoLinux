@@ -11,19 +11,32 @@ final class Analysis {
                 (!o.has("role") || Options.includes(n.role, o.get("role", ""))) &&
                 (!o.has("text") || Options.includes(n.text, o.get("text", ""))) &&
                 (!o.has("id") || Objects.equals(n.accessibleId, o.get("id", ""))) &&
-                (!o.has("path") || Objects.equals(n.path, o.get("path", "")))).toList();
+                (!o.has("path") || Objects.equals(n.path, o.get("path", "")))).collect(java.util.stream.Collectors.toList());
     }
     static String field(Node n, String field) {
-        return switch (field) {
-            case "text" -> n.text; case "name" -> n.name;
-            case "value" -> n.value == null ? null : n.value.toString();
-            default -> throw new IllegalArgumentException("--field debe ser text, name o value");
-        };
+        switch (field) {
+            case "text": return n.text;
+            case "name": return n.name;
+            case "value": return n.value == null ? null : n.value.toString();
+            default: throw new IllegalArgumentException("--field debe ser text, name o value");
+        }
     }
-    record Check(boolean passed, String reason, int matches, String actual) {}
+    static final class Check {
+        private final boolean passed;
+        private final String reason;
+        private final int matches;
+        private final String actual;
+        Check(boolean passed, String reason, int matches, String actual) {
+            this.passed = passed; this.reason = reason; this.matches = matches; this.actual = actual;
+        }
+        boolean passed() { return passed; }
+        String reason() { return reason; }
+        int matches() { return matches; }
+        String actual() { return actual; }
+    }
     static Check check(Snapshot s, Options o) {
         String field = o.get("field", "text");
-        if (!Set.of("text", "name", "value").contains(field)) throw new IllegalArgumentException("--field inválido");
+        if (!Compat.set("text", "name", "value").contains(field)) throw new IllegalArgumentException("--field inválido");
         if (o.has("equals") == o.has("contains")) throw new IllegalArgumentException("Usa exactamente una de --equals o --contains");
         if (!s.ok) return new Check(false, "Error de infraestructura: " + s.error, 0, null);
         List<Node> matches = select(s, o);
@@ -41,11 +54,11 @@ final class Analysis {
         Map<String, Object> result = new LinkedHashMap<>();
         long errors = s.nodes.stream().filter(n -> !n.errors.isEmpty()).count();
         long texts = s.nodes.stream().filter(n -> n.text != null).count();
-        long names = s.nodes.stream().filter(n -> n.depth > 0 && !n.name.isBlank()).count();
-        long ids = s.nodes.stream().filter(n -> !n.accessibleId.isBlank()).count();
+        long names = s.nodes.stream().filter(n -> n.depth > 0 && !Compat.blank(n.name)).count();
+        long ids = s.nodes.stream().filter(n -> !Compat.blank(n.accessibleId)).count();
         long values = s.nodes.stream().filter(n -> n.value != null).count();
         long meaningful = s.nodes.stream().filter(n -> n.depth > 0 &&
-                ((!n.name.isBlank() && !container(n.role)) || (n.text != null && !n.text.isEmpty()) || n.value != null)).count();
+                ((!Compat.blank(n.name) && !container(n.role)) || (n.text != null && !n.text.isEmpty()) || n.value != null)).count();
         boolean partial = s.truncated || errors > 0 || s.nodes.stream().anyMatch(n -> n.textTruncated)
                 || !s.warnings.isEmpty() || s.apps.stream().anyMatch(a -> a.selected && !a.errors.isEmpty());
         String verdict = !s.ok ? "ERROR_DE_ENTORNO" : s.matchedApps == 0 ? "APLICACION_NO_ENCONTRADA"
@@ -59,7 +72,7 @@ final class Analysis {
         return result;
     }
     private static boolean container(String role) {
-        return Set.of("application", "frame", "window", "panel", "root pane", "layered pane", "filler", "desktop frame").contains(role);
+        return Compat.set("application", "frame", "window", "panel", "root pane", "layered pane", "filler", "desktop frame").contains(role);
     }
     static List<Map<String, Object>> diff(Snapshot before, Snapshot after) {
         Map<String, Node> a = before.nodes.stream().collect(Collectors.toMap(n -> n.path, n -> n, (x,y) -> x, LinkedHashMap::new));

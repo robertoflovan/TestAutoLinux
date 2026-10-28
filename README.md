@@ -1,6 +1,8 @@
 # Laboratorio de accesibilidad para un punto de venta en Linux
 
-Proyecto Java 17+ para averiguar si un POS expone **elementos, etiquetas, texto y valores**, antes de automatizar su teclado. No necesitas conocer todavía la tecnología de la aplicación. El ZIP portable incluye el JAR compilado y el código; **Linux no necesita Maven ni Internet para ejecutar el JAR** una vez instaladas las dependencias del sistema.
+Proyecto compatible con **Java 8 (1.8) o superior**, desde la versión **1.1.0**, para averiguar si un POS expone **elementos, etiquetas, texto y valores**, antes de automatizar su teclado. No necesitas conocer todavía la tecnología de la aplicación. El ZIP portable incluye el JAR compilado y el código; **Linux no necesita Maven ni Internet para ejecutar el JAR** una vez instaladas las dependencias del sistema.
+
+Si ya descargaste la versión anterior (que requería Java 17), actualiza con `git pull --ff-only` desde la carpeta del repositorio o descarga el ZIP otra vez. `bash run.sh help` debe mostrar **1.1.0 · Java 8 (1.8)+**. No hace falta cambiar el Java del equipo ni el que utiliza el POS.
 
 La finalidad es obtener evidencia: ¿aparece el proceso?, ¿hay controles dentro de la ventana?, ¿se puede leer el contenido del producto/total/mensajes?, ¿cambia al operar manualmente?, ¿puede localizarse sin coordenadas?
 
@@ -16,7 +18,7 @@ java -version
 rpm -q at-spi2-core libatspi0
 ```
 
-Los dos últimos comandos comprueban Java (se requiere 17+) y las bibliotecas de SUSE/SLES. Si están disponibles, deja el POS abierto y ejecuta desde esa carpeta:
+Los dos últimos comandos comprueban Java (1.8 o superior) y las bibliotecas de SUSE/SLES. Si están disponibles, deja el POS abierto y ejecuta desde esa carpeta:
 
 ```bash
 bash run.sh doctor --backend jna --out reports/entorno
@@ -52,17 +54,19 @@ Comprueba primero:
 java -version
 ```
 
-Se requiere Java **17 o superior**. La vía Java no requiere instalar Python. En Debian/Ubuntu, si faltan dependencias, estos son los paquetes habituales; los instala el administrador del equipo:
+Se requiere Java **8 (1.8) o superior**. Si ya hay Java 1.8, no necesitas sustituirlo. La vía Java no requiere instalar Python. En Debian/Ubuntu, si faltan dependencias, estos son los paquetes habituales; los instala el administrador del equipo:
 
 ```bash
 sudo apt-get update
-sudo apt-get install openjdk-17-jre at-spi2-core libatspi2.0-0
+sudo apt-get install at-spi2-core libatspi2.0-0
+# Sólo si no existe ningún Java compatible, ejemplo de JRE disponible en Ubuntu:
+sudo apt-get install openjdk-17-jre
 
 # Para comparar también con Python y abrir el control de ejemplo:
 sudo apt-get install python3 python3-gi gir1.2-atspi-2.0 gir1.2-gtk-3.0
 ```
 
-Para otras distribuciones, busca los equivalentes de Java 17+, libatspi, PyGObject y los typelibs de Atspi/GTK3. La disponibilidad depende de la distribución y sus repositorios. No utilices `pip install gi`: se trata de paquetes del sistema. Si usas conda/venv y no ve `gi`, especifica `--python /usr/bin/python3`.
+Para otras distribuciones, busca los equivalentes de Java 8+, libatspi, PyGObject y los typelibs de Atspi/GTK3. La disponibilidad depende de la distribución y sus repositorios. No utilices `pip install gi`: se trata de paquetes del sistema. Si usas conda/venv y no ve `gi`, especifica `--python /usr/bin/python3`.
 
 No necesitas dar permiso de ejecución al script: usa `bash run.sh`. También puedes ejecutar cualquier comando con `java -jar pos-accessibility-lab.jar ...`.
 
@@ -70,7 +74,7 @@ No necesitas dar permiso de ejecución al script: usa `bash run.sh`. También pu
 
 El proyecto no está limitado a Ubuntu: la vía JNA detecta Linux y carga las bibliotecas AT-SPI del sistema. **SLES 15 SP7 es un destino posible, pero no se ha probado este laboratorio en una instalación SLES real.** La lectura del POS depende de su accesibilidad y de la sesión, no sólo de la distribución.
 
-En SUSE se utiliza `zypper`, no los comandos `apt-get` del ejemplo anterior. SUSE documenta OpenJDK 21 (`java-21-openjdk`) en Basesystem y OpenJDK 17 (`java-17-openjdk`) en Legacy para SP7. El laboratorio acepta ambos. Los paquetes de accesibilidad se llaman `at-spi2-core` y `libatspi0`; no `libatspi2.0-0` como en Debian/Ubuntu. Su disponibilidad en el equipo depende de los módulos y repositorios habilitados.
+En SUSE se utiliza `zypper`, no los comandos `apt-get` del ejemplo anterior. **Java 1.8 existente es suficiente para la versión 1.1.0 del laboratorio; no es necesario instalar Java 17/21.** Los paquetes de accesibilidad se llaman `at-spi2-core` y `libatspi0`; no `libatspi2.0-0` como en Debian/Ubuntu. Su disponibilidad en el equipo depende de los módulos y repositorios habilitados.
 
 Primero consulta lo que ya existe, sin instalar ni modificar nada:
 
@@ -98,7 +102,7 @@ Para comparar después con la vía Python, comprueba primero que el intérprete 
 /usr/bin/python3 -c 'import gi; gi.require_version("Atspi", "2.0"); from gi.repository import Atspi; print("Binding Atspi disponible")'
 ```
 
-Esto sólo verifica la importación, no el acceso al POS. Los nombres de paquetes SUSE que conviene buscar son `python3-gobject` y `typelib-1_0-Atspi-2_0`; para el control GTK, también `python3-gobject-Gdk` y `typelib-1_0-Gtk-3_0`. Confirma su disponibilidad para los módulos y el intérprete de esa instalación. No reemplaces el Python del sistema ni cambies el Java predeterminado del POS para ejecutar el laboratorio: puedes lanzar el JAR con la ruta completa de otro Java 17+.
+Esto sólo verifica la importación, no el acceso al POS. Los nombres de paquetes SUSE que conviene buscar son `python3-gobject` y `typelib-1_0-Atspi-2_0`; para el control GTK, también `python3-gobject-Gdk` y `typelib-1_0-Gtk-3_0`. Confirma su disponibilidad para los módulos y el intérprete de esa instalación. No reemplaces el Python del sistema ni cambies el Java predeterminado del POS para ejecutar el laboratorio.
 
 Que el producto se llame **Server** no demuestra que sea una sesión sin escritorio: SLES ofrece entornos gráficos. Lo que hay que confirmar es dónde se ejecuta realmente la interfaz del POS. Si es una terminal de texto o un visor remoto, la interpretación del árbol será diferente.
 
@@ -273,7 +277,7 @@ En `suite`, un código `0` indica que al menos una lectura produjo elementos út
 
 ## Compilar, probar y crear el ZIP
 
-En este proyecto, con JDK 17+ y Maven:
+Para compilar se recomienda JDK 17+ y Maven; `maven.compiler.release=8` comprueba las APIs de Java 8 y genera bytecode compatible con ese runtime. El equipo Linux de destino sólo necesita su JRE 1.8+, no el JDK de compilación:
 
 ```bash
 mvn clean package

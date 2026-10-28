@@ -17,8 +17,8 @@ class AnalysisTest {
         return s;
     }
     Options check(String... extra) {
-        List<String> args = new ArrayList<>(List.of("check", "--pid", "123", "--id", "total", "--equals", "125.50"));
-        args.addAll(List.of(extra)); return new Options(args.toArray(String[]::new));
+        List<String> args = new ArrayList<>(Compat.list("check", "--pid", "123", "--id", "total", "--equals", "125.50"));
+        args.addAll(Compat.list(extra)); return new Options(args.toArray(new String[0]));
     }
     @Test void validatesActualText() { assertTrue(Analysis.check(sample(), check()).passed()); }
     @Test void doesNotMistakeNameForText() {
@@ -96,8 +96,8 @@ class AnalysisTest {
     }
     @Test void htmlEscapesUntrustedApplicationText() throws Exception {
         Snapshot s = sample(); s.nodes.get(0).text = "<script>alert('x')</script>";
-        Report.write(temp, List.of(s), "<img src=x>");
-        String html = Files.readString(temp.resolve("report.html"));
+        Report.write(temp, Compat.list(s), "<img src=x>");
+        String html = Compat.read(temp.resolve("report.html"));
         assertFalse(html.contains("<script>")); assertFalse(html.contains("<img src=x>")); assertTrue(html.contains("&lt;script&gt;"));
     }
     @Test void rejectsInvalidBoundsAndUnknownFlags() {

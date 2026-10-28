@@ -13,20 +13,20 @@ final class Runner {
         Files.deleteIfExists(result);
         List<String> command = new ArrayList<>();
         if (backend.equals("jna")) {
-            String java = Path.of(System.getProperty("java.home"), "bin", "java").toString();
-            command.addAll(List.of(java, "-Dfile.encoding=UTF-8", "-cp", System.getProperty("java.class.path"), Main.class.getName(), "internal-jna"));
+            String javaExecutable = Paths.get(System.getProperty("java.home"), "bin", "java").toString();
+            command.addAll(Compat.list(javaExecutable, "-Dfile.encoding=UTF-8", "-cp", System.getProperty("java.class.path"), Main.class.getName(), "internal-jna"));
         } else {
             Path bridge = directory.resolve("atspi_probe.py").toAbsolutePath();
-            try (var resource = Runner.class.getResourceAsStream("/bridge/atspi_probe.py")) {
+            try (java.io.InputStream resource = Runner.class.getResourceAsStream("/bridge/atspi_probe.py")) {
                 if (resource == null) throw new IllegalStateException("No se encontró el puente Python dentro del JAR");
                 Files.copy(resource, bridge, StandardCopyOption.REPLACE_EXISTING);
             }
-            command.addAll(List.of(options.get("python", "python3"), bridge.toString()));
+            command.addAll(Compat.list(options.get("python", "python3"), bridge.toString()));
         }
-        for (String key : List.of("app", "pid", "max-nodes", "max-depth", "max-text", "timeout"))
-            if (options.has(key)) command.addAll(List.of("--" + key, options.get(key, "")));
-        if (list) command.addAll(List.of("--list-only", "true"));
-        command.addAll(List.of("--result", result.toString()));
+        for (String key : Compat.list("app", "pid", "max-nodes", "max-depth", "max-text", "timeout"))
+            if (options.has(key)) command.addAll(Compat.list("--" + key, options.get(key, "")));
+        if (list) command.addAll(Compat.list("--list-only", "true"));
+        command.addAll(Compat.list("--result", result.toString()));
         Snapshot s;
         try {
             Process process = new ProcessBuilder(command).redirectOutput(directory.resolve(stem + ".stdout.log").toFile())
@@ -48,10 +48,8 @@ final class Runner {
     static boolean finish(Process process, int seconds) throws InterruptedException {
         try {
             if (process.waitFor(seconds, TimeUnit.SECONDS)) return true;
-            process.descendants().forEach(ProcessHandle::destroyForcibly);
             process.destroyForcibly(); process.waitFor(2, TimeUnit.SECONDS); return false;
         } catch (InterruptedException e) {
-            process.descendants().forEach(ProcessHandle::destroyForcibly);
             process.destroyForcibly(); Thread.currentThread().interrupt(); throw e;
         }
     }

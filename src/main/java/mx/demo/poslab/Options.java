@@ -3,7 +3,7 @@ package mx.demo.poslab;
 import java.util.*;
 
 public final class Options {
-    private static final Set<String> ALLOWED = Set.of("backend", "app", "pid", "out", "python", "max-nodes",
+    private static final Set<String> ALLOWED = Compat.set("backend", "app", "pid", "out", "python", "max-nodes",
             "max-depth", "max-text", "timeout", "samples", "interval", "name", "role", "id", "path", "text",
             "field", "equals", "contains", "before", "after", "result", "list-only");
     final String command;
@@ -22,8 +22,8 @@ public final class Options {
         number("samples", 3, 2, 20); number("interval", 2000, 100, 60000);
         if (has("pid")) { try { if (Long.parseLong(get("pid", "")) <= 0) throw new NumberFormatException(); }
             catch (NumberFormatException e) { throw new IllegalArgumentException("--pid debe ser un entero positivo"); } }
-        if (has("app") && get("app", "").isBlank()) throw new IllegalArgumentException("--app no puede estar vacío");
-        if (!Set.of("jna", "python", "both").contains(get("backend", "jna")))
+        if (has("app") && Compat.blank(get("app", ""))) throw new IllegalArgumentException("--app no puede estar vacío");
+        if (!Compat.set("jna", "python", "both").contains(get("backend", "jna")))
             throw new IllegalArgumentException("--backend debe ser jna, python o both");
     }
     String get(String key, String fallback) { return values.getOrDefault(key, fallback); }

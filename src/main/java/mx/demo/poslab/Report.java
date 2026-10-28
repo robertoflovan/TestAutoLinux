@@ -7,20 +7,18 @@ import static mx.demo.poslab.Model.*;
 
 final class Report {
     static void write(Path out, List<Snapshot> snapshots, String notes) throws Exception {
-        List<Map<String, Object>> summaries = snapshots.stream().map(Analysis::summary).toList();
+        List<Map<String, Object>> summaries = snapshots.stream().map(Analysis::summary).collect(java.util.stream.Collectors.toList());
         Json.write(out.resolve("summary.json"), summaries);
         StringBuilder text = new StringBuilder("POS ACCESSIBILITY LAB\n\n").append(notes).append("\n\n");
         for (Map<String, Object> summary : summaries) {
             summary.forEach((key,value) -> text.append(key).append(": ").append(value).append('\n'));
             text.append('\n');
         }
-        Files.writeString(out.resolve("summary.txt"), text, StandardCharsets.UTF_8);
-        StringBuilder html = new StringBuilder("""
-                <!doctype html><html lang="es"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-                <title>Diagnóstico de accesibilidad del POS</title>
-                <style>body{font:16px system-ui,sans-serif;margin:2rem;color:#172238;background:#f4f7fb}main{max-width:1400px;margin:auto}section{background:white;padding:1.2rem;margin:1rem 0;border:1px solid #d5deea;border-radius:12px}pre{white-space:pre-wrap;overflow-wrap:anywhere}table{border-collapse:collapse;width:100%;font-size:13px}th,td{padding:.6rem;border-bottom:1px solid #d5deea;text-align:left;vertical-align:top;white-space:pre-wrap;overflow-wrap:anywhere}th{background:#edf2fa}code{font-family:monospace}.scroll{overflow-x:auto}h1{font-size:1.8rem}small{color:#475569}</style>
-                <main><h1>Diagnóstico de accesibilidad del punto de venta</h1>
-                """);
+        Compat.write(out.resolve("summary.txt"), text);
+        StringBuilder html = new StringBuilder("<!doctype html><html lang=\"es\"><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n"
+                + "<title>Diagnóstico de accesibilidad del POS</title>\n"
+                + "<style>body{font:16px system-ui,sans-serif;margin:2rem;color:#172238;background:#f4f7fb}main{max-width:1400px;margin:auto}section{background:white;padding:1.2rem;margin:1rem 0;border:1px solid #d5deea;border-radius:12px}pre{white-space:pre-wrap;overflow-wrap:anywhere}table{border-collapse:collapse;width:100%;font-size:13px}th,td{padding:.6rem;border-bottom:1px solid #d5deea;text-align:left;vertical-align:top;white-space:pre-wrap;overflow-wrap:anywhere}th{background:#edf2fa}code{font-family:monospace}.scroll{overflow-x:auto}h1{font-size:1.8rem}small{color:#475569}</style>\n"
+                + "<main><h1>Diagnóstico de accesibilidad del punto de venta</h1>\n");
         html.append("<section><pre>").append(escape(notes)).append("</pre><small>Consulta los JSON para los datos completos. Sin OCR, capturas ni envío de entradas.</small></section>");
         for (Snapshot s : snapshots) {
             html.append("<section><h2>").append(escape(s.backend)).append(" · ").append(escape(s.capturedAt)).append("</h2><pre>")
@@ -38,7 +36,7 @@ final class Report {
             html.append("</tbody></table></div></section>");
         }
         html.append("</main></html>");
-        Files.writeString(out.resolve("report.html"), html, StandardCharsets.UTF_8);
+        Compat.write(out.resolve("report.html"), html);
     }
     static String escape(String value) {
         if (value == null) return "";

@@ -11,10 +11,10 @@ class RunnerTest {
         }
     }
     Process start(String... args) throws Exception {
-        var command = new java.util.ArrayList<>(java.util.List.of(
-                Path.of(System.getProperty("java.home"), "bin", "java").toString(),
+        java.util.List<String> command = new java.util.ArrayList<>(Compat.list(
+                java.nio.file.Paths.get(System.getProperty("java.home"), "bin", "java").toString(),
                 "-cp", System.getProperty("java.class.path"), Child.class.getName()));
-        command.addAll(java.util.List.of(args)); return new ProcessBuilder(command).start();
+        command.addAll(Compat.list(args)); return new ProcessBuilder(command).start();
     }
     @Test void killsHungReaderWithinTimeout() throws Exception {
         Process child = start("sleep");

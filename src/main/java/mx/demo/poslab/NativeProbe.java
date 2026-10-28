@@ -43,7 +43,15 @@ public final class NativeProbe {
     private final Options options;
     private final Snapshot snapshot = new Snapshot();
     private final long deadline;
-    private record Entry(Pointer pointer, String path, int depth, App app) {}
+    private static final class Entry {
+        final Pointer pointer;
+        final String path;
+        final int depth;
+        final App app;
+        Entry(Pointer pointer, String path, int depth, App app) {
+            this.pointer = pointer; this.path = path; this.depth = depth; this.app = app;
+        }
+    }
     private static final Map<Integer, String> STATES = new LinkedHashMap<>();
     static {
         STATES.put(1,"active"); STATES.put(3,"busy"); STATES.put(4,"checked"); STATES.put(6,"defunct");
