@@ -1,0 +1,22 @@
+POS Accessibility Lab - Java dependencies included in the executable JAR
+
+JNA 5.17.0
+Project: https://github.com/java-native-access/jna
+License: Apache License 2.0 or LGPL 2.1 (dual licensed by its authors).
+License text/source: https://github.com/java-native-access/jna/blob/5.17.0/LICENSE
+
+Gson 2.13.1
+Project: https://github.com/google/gson
+License: Apache License 2.0.
+License text/source: https://github.com/google/gson/blob/gson-parent-2.13.1/LICENSE
+
+Error Prone annotations 2.38.0 (transitive Gson dependency)
+Project: https://github.com/google/error-prone
+License: Apache License 2.0.
+License text/source: https://github.com/google/error-prone/blob/v2.38.0/COPYING
+
+Apache License 2.0: https://www.apache.org/licenses/LICENSE-2.0
+Original dependency notices and bundled native JNA binaries remain inside the JAR.
+
+Linux AT-SPI, GLib, GObject, PyGObject, GTK and Java are system dependencies;
+their binaries are not distributed in this ZIP. JUnit is used only for build tests.
