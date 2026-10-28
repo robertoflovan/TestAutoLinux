@@ -42,6 +42,7 @@ final class Runner {
         } catch (java.io.IOException | com.google.gson.JsonParseException e) {
             s = Snapshot.failure(backend, "No se pudo ejecutar/leer el backend: " + e.getMessage());
         }
+        s.inventoryOnly = list;
         Json.write(result, s);
         return s;
     }

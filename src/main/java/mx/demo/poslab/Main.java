@@ -93,7 +93,8 @@ public final class Main {
         }
         Report.write(out, snapshots, notes);
         System.out.println("Reporte: " + out.resolve("report.html"));
-        for (Snapshot s : snapshots) System.out.println(s.backend + ": " + Analysis.summary(s).get("veredicto") + " · " + s.nodes.size() + " elementos");
+        for (Snapshot s : snapshots) System.out.println(s.backend + ": " + Analysis.summary(s).get("veredicto") + " · "
+                + (s.inventoryOnly ? s.apps.size() + " aplicaciones" : s.nodes.size() + " elementos"));
         if (o.command.equals("check")) return Analysis.check(snapshots.get(0), o).passed() ? 0 : 3;
         if (snapshots.stream().noneMatch(s -> s.ok)) return 2;
         if (o.command.equals("find")) return !Analysis.select(snapshots.get(0), o).isEmpty() ? 0 : 3;
@@ -118,7 +119,7 @@ public final class Main {
         return env;
     }
     private static void help() {
-        System.out.println("POS Accessibility Lab 1.1.0 · Java 8 (1.8)+ · sólo lectura\n"
+        System.out.println("POS Accessibility Lab 1.1.1 · Java 8 (1.8)+ · sólo lectura\n"
                 + "Uso: bash run.sh COMANDO [--opción valor ...]\n"
                 + "  doctor                         Entorno + prueba del registro con ambas vías\n"
                 + "  list [--backend both]          Nombres, PID y toolkit de aplicaciones\n"

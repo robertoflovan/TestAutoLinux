@@ -61,14 +61,19 @@ final class Analysis {
                 ((!Compat.blank(n.name) && !container(n.role)) || (n.text != null && !n.text.isEmpty()) || n.value != null)).count();
         boolean partial = s.truncated || errors > 0 || s.nodes.stream().anyMatch(n -> n.textTruncated)
                 || !s.warnings.isEmpty() || s.apps.stream().anyMatch(a -> a.selected && !a.errors.isEmpty());
-        String verdict = !s.ok ? "ERROR_DE_ENTORNO" : s.matchedApps == 0 ? "APLICACION_NO_ENCONTRADA"
+        String verdict = !s.ok ? "ERROR_DE_ENTORNO"
+                : s.inventoryOnly ? (partial ? "INVENTARIO_PARCIAL" : s.apps.isEmpty() ? "REGISTRO_VACIO" : "INVENTARIO_LEIDO")
+                : s.matchedApps == 0 ? "APLICACION_NO_ENCONTRADA"
                 : s.matchedApps > 1 ? "OBJETIVO_AMBIGUO" : partial ? "LECTURA_PARCIAL"
                 : meaningful > 0 ? "ELEMENTOS_LEIBLES" : "SOLO_CONTENEDORES_O_SIN_CONTENIDO";
         result.put("backend", s.backend); result.put("veredicto", verdict); result.put("aplicacionesObjetivo", s.matchedApps);
+        result.put("soloInventario", s.inventoryOnly); result.put("aplicacionesDetectadas", s.apps.size());
         result.put("elementos", s.nodes.size()); result.put("nombresDescendientes", names); result.put("lecturasTexto", texts);
         result.put("valoresNumericos", values); result.put("ids", ids); result.put("elementosConErrores", errors);
         result.put("truncado", s.truncated); result.put("error", s.error);
-        result.put("interpretacion", "Encontrar elementos no garantiza que todos los campos del POS sean accesibles. Valida producto, total y mensajes con valores conocidos.");
+        result.put("interpretacion", s.inventoryOnly
+                ? "Sólo se enumeraron aplicaciones; no se exploraron sus controles. Selecciona el PID del POS con inspect o suite para leer elementos."
+                : "Encontrar elementos no garantiza que todos los campos del POS sean accesibles. Valida producto, total y mensajes con valores conocidos.");
         return result;
     }
     private static boolean container(String role) {

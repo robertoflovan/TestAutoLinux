@@ -73,6 +73,19 @@ class AnalysisTest {
         Snapshot s = sample(); s.matchedApps = 0; s.nodes.clear();
         assertEquals("APLICACION_NO_ENCONTRADA", Analysis.summary(s).get("veredicto"));
     }
+    @Test void inventoryOfMultipleAppsIsNotAnAmbiguousTarget() {
+        Snapshot s = sample(); s.inventoryOnly = true; s.nodes.clear(); s.matchedApps = 15;
+        s.apps.add(new App()); s.apps.add(new App());
+        assertEquals("INVENTARIO_LEIDO", Analysis.summary(s).get("veredicto"));
+    }
+    @Test void emptyInventoryDoesNotClaimAnAppIsInaccessible() {
+        Snapshot s = new Snapshot(); s.ok = true; s.inventoryOnly = true;
+        assertEquals("REGISTRO_VACIO", Analysis.summary(s).get("veredicto"));
+    }
+    @Test void inventoryReadErrorsStayVisible() {
+        Snapshot s = new Snapshot(); s.ok = true; s.inventoryOnly = true; s.warnings.add("desktop.child: timeout");
+        assertEquals("INVENTARIO_PARCIAL", Analysis.summary(s).get("veredicto"));
+    }
     @Test void frameTitleAloneIsNotProofOfReadableFields() {
         Snapshot s = sample(); Node n = s.nodes.get(0); n.text = null; n.role = "frame";
         assertEquals("SOLO_CONTENEDORES_O_SIN_CONTENIDO", Analysis.summary(s).get("veredicto"));

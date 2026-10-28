@@ -2,7 +2,7 @@
 
 Proyecto compatible con **Java 8 (1.8) o superior**, desde la versión **1.1.0**, para averiguar si un POS expone **elementos, etiquetas, texto y valores**, antes de automatizar su teclado. No necesitas conocer todavía la tecnología de la aplicación. El ZIP portable incluye el JAR compilado y el código; **Linux no necesita Maven ni Internet para ejecutar el JAR** una vez instaladas las dependencias del sistema.
 
-Si ya descargaste la versión anterior (que requería Java 17), actualiza con `git pull --ff-only` desde la carpeta del repositorio o descarga el ZIP otra vez. `bash run.sh help` debe mostrar **1.1.0 · Java 8 (1.8)+**. No hace falta cambiar el Java del equipo ni el que utiliza el POS.
+Si ya descargaste la versión anterior (que requería Java 17), actualiza con `git pull --ff-only` desde la carpeta del repositorio o descarga el ZIP otra vez. `bash run.sh help` debe mostrar **1.1.1 · Java 8 (1.8)+**. No hace falta cambiar el Java del equipo ni el que utiliza el POS.
 
 La finalidad es obtener evidencia: ¿aparece el proceso?, ¿hay controles dentro de la ventana?, ¿se puede leer el contenido del producto/total/mensajes?, ¿cambia al operar manualmente?, ¿puede localizarse sin coordenadas?
 
@@ -120,6 +120,8 @@ bash run.sh list --backend both --python /usr/bin/python3 --out reports/aplicaci
 `doctor` recoge tipo de sesión, escritorio, versión de Java y presencia de variables de sesión; además consulta el registro por las dos vías. No demuestra por sí solo que los campos del POS se puedan leer. Un `AWT headless=true` afecta a herramientas como Robot, pero no determina que AT-SPI sea inaccesible.
 
 `list` imprime **PID, nombre accesible y toolkit**. El nombre accesible de la aplicación puede diferir del título de su ventana. Usa preferentemente el PID que aparece en esta lista. Si no aparece, mira la sección de diagnóstico antes de concluir que el POS es incompatible.
+
+Desde 1.1.1, `doctor` y `list` informan `INVENTARIO_LEIDO` y el número de aplicaciones: estos comandos no recorren controles. En 1.1.0 podían mostrar `OBJETIVO_AMBIGUO · 0 elementos` al enumerar varias aplicaciones; ese mensaje no significaba que el acceso al escritorio hubiera fallado. Usa `inspect --pid PID` o `suite --pid PID` para explorar una aplicación concreta.
 
 ## 3. Ejecutar las pruebas comparativas
 

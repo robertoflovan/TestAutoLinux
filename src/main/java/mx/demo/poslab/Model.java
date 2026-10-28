@@ -25,7 +25,7 @@ public final class Model {
     public static class Snapshot {
         public int schemaVersion = 1;
         public String backend = "", capturedAt = Instant.now().toString(), error;
-        public boolean ok, truncated;
+        public boolean ok, truncated, inventoryOnly;
         public int matchedApps;
         public List<App> apps = new ArrayList<>();
         public List<Node> nodes = new ArrayList<>();
