@@ -257,6 +257,33 @@ Los conteos no eligen automáticamente la mejor herramienta. Lo decisivo es si p
 - **Terminal o escritorio remoto:** puedes estar inspeccionando un emulador/visor, no el proceso POS. Un terminal puede publicar una superficie de texto sin campos separados. En RDP/VNC, el lector debería ejecutarse dentro de la sesión donde realmente está el POS.
 - **Campos dibujados a medida:** podrían no exponer semántica accesible. Antes de descartar la vía, compara con Accerciser y consulta al proveedor. Puede haber un modo de accesibilidad o integración que necesite habilitarse.
 
+## Control Swing con un Java 8 existente y un puente extraído
+
+Si no puedes cambiar Java, `examples/run-swing-atk.sh` abre una ventana independiente con datos ficticios. Requiere un **JDK 8 ya instalado** (incluido `javac`) y el JAR y `.so` de Java ATK Wrapper previamente extraídos de un RPM confiable. No instala paquetes ni cambia alternativas Java, archivos del JRE o propiedades de accesibilidad del usuario. La carga del puente se configura sólo para el proceso de prueba mediante la [propiedad de accesibilidad de Java](https://docs.oracle.com/javase/8/docs/technotes/guides/access/new-features.html).
+
+Antes de ejecutarlo, comprueba la compatibilidad del bytecode del puente con Java 8 y sus dependencias nativas con `ldd`. Que esas comprobaciones pasen no demuestra todavía que el puente funcione.
+
+Desde una terminal de la misma sesión gráfica, sin `sudo`:
+
+```bash
+bash examples/run-swing-atk.sh /usr/java/jdk1.8.0_191 "$HOME/pos-atk-prueba/extraido/usr/lib64/java-atk-wrapper"
+```
+
+El script compila el ejemplo en `$HOME/pos-atk-prueba/clases`, muestra la versión y PID de la prueba y mantiene la ventana abierta. Su variable `LD_LIBRARY_PATH` sólo afecta al script y al proceso que lanza. Deja esa terminal abierta. En otra terminal, desde la carpeta del laboratorio, sustituye `12345` por el **PID de la prueba** mostrado:
+
+```bash
+bash run.sh inspect --backend jna --pid 12345 --out reports/swing-inicial
+bash run.sh check --backend jna --pid 12345 --name TotalVenta --field text --equals 125.50 --out reports/swing-total-inicial
+```
+
+Se espera encontrar `CodigoProducto` con `1001`, `DescripcionProducto` con `Cafe de prueba` y `TotalVenta` con `125.50`. En la ventana de ejemplo cambia el código a `1002` y pulsa Enter. Después:
+
+```bash
+bash run.sh check --backend jna --pid 12345 --name TotalVenta --field text --equals 80.00 --out reports/swing-total-cambiado
+```
+
+Un `PASS` en ambas lecturas confirma la lectura de ese campo y su cambio en el ejemplo. No demuestra aún la accesibilidad del POS real: depende de sus componentes y de cómo se active el puente en su JVM. Si la ventana no aparece, conserva el error de la primera terminal; si aparece pero no se puede inspeccionar, conserva los reportes. Cerrar la ventana termina sólo el ejemplo.
+
 ## Límites y códigos de salida
 
 Valores por defecto por captura: 2,000 elementos, profundidad 25, 2,000 caracteres por campo, timeout total 45 segundos, timeout de consulta AT-SPI 800 ms. Ejemplo para ampliar:
