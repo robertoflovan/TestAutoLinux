@@ -11,7 +11,7 @@ $taskStream = [System.IO.File]::Open($taskZip, [System.IO.FileMode]::Create)
 $taskArchive = New-Object System.IO.Compression.ZipArchive($taskStream, [System.IO.Compression.ZipArchiveMode]::Create)
 try {
     $taskFiles = @('pom.xml', 'README.md', 'THIRD-PARTY.txt', 'run.sh', '.gitignore', '.gitattributes') | ForEach-Object { Get-Item -LiteralPath (Join-Path $taskRoot $_) }
-    foreach ($taskFolder in @('src', 'tests', 'examples', 'scripts')) {
+    foreach ($taskFolder in @('src', 'tests', 'examples', 'scripts', 'patches')) {
         $taskFiles += Get-ChildItem -LiteralPath (Join-Path $taskRoot $taskFolder) -File -Recurse | Where-Object { $_.FullName -notmatch '[\\/]__pycache__[\\/]' -and $_.Extension -ne '.pyc' }
     }
     foreach ($taskFile in $taskFiles) {
