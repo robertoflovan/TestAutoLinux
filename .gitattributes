@@ -4,3 +4,5 @@
 *.patch text eol=lf
 *.md text eol=lf
 *.jar binary
+*.tar.xz binary
+*.zip binary

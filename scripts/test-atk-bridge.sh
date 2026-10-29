@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
+ulimit -c 0
 task_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 task_build="$task_root/target/atk-build"
 task_logs="$task_build/test-logs"
@@ -9,6 +10,7 @@ export AT_SPI_BUS_ADDRESS
 AT_SPI_BUS_ADDRESS="$(gdbus call --session --dest org.a11y.Bus --object-path /org/a11y/bus --method org.a11y.Bus.GetAddress | cut -d "'" -f2)"
 [[ "$AT_SPI_BUS_ADDRESS" == unix:* ]]
 xprop -root -f AT_SPI_BUS 8s -set AT_SPI_BUS "$AT_SPI_BUS_ADDRESS"
+xprop -root AT_SPI_BUS
 "$JAVA_HOME/bin/javac" -encoding UTF-8 -d "$task_build/classes" "$task_root/examples/PosSwingControl.java"
 export LD_LIBRARY_PATH="$JAVA_HOME/jre/lib/amd64:$JAVA_HOME/jre/lib/amd64/server"
 task_pid=''

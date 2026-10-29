@@ -20,7 +20,7 @@ jobs:
       - name: Build original and corrected libraries
         run: bash scripts/build-atk-bridge.sh
       - name: Test isolated Swing window and reader disconnects
-        run: dbus-run-session -- xvfb-run -a bash scripts/test-atk-bridge.sh
+        run: dbus-run-session -- xvfb-run -a -s '-screen 0 1280x800x24 -noreset' bash scripts/test-atk-bridge.sh
       - uses: actions/upload-artifact@v4
         if: always()
         with:
