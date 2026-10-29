@@ -284,6 +284,11 @@ bash run.sh check --backend jna --pid 12345 --name TotalVenta --field text --equ
 
 Un `PASS` en ambas lecturas confirma la lectura de ese campo y su cambio en el ejemplo. No demuestra aún la accesibilidad del POS real: depende de sus componentes y de cómo se active el puente en su JVM. Si la ventana no aparece, conserva el error de la primera terminal; si aparece pero no se puede inspeccionar, conserva los reportes. Cerrar la ventana termina sólo el ejemplo.
 
+Si el ejemplo devuelve `PASS` pero termina con `SIGSEGV` en `g_int_hash` usando
+Java ATK Wrapper 0.33.2, hay una [copia corregida experimental](experimental/README.md)
+con instrucciones para probarla sin instalar compiladores ni cambiar Java.
+Su validación en CI no sustituye la prueba en el Linux del cliente.
+
 ## Límites y códigos de salida
 
 Valores por defecto por captura: 2,000 elementos, profundidad 25, 2,000 caracteres por campo, timeout total 45 segundos, timeout de consulta AT-SPI 800 ms. Ejemplo para ampliar:

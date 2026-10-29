@@ -1,8 +1,10 @@
 # Corrección experimental para Java ATK Wrapper 0.33.2
 
-Estado: parche de fuentes preparado y comprobado contra el original de GNOME;
-todavía no compilado ni validado en el Linux del cliente. No se aplica
-automáticamente y no forma parte del JAR del laboratorio.
+Estado: biblioteca compilada en un entorno Linux separado mediante GitHub
+Actions; validación en el Linux del cliente pendiente. El parche no se aplica
+automáticamente y no forma parte del JAR del laboratorio. La reconstrucción
+experimental conserva los parches de distribución descritos en
+[suse-0.33.2/README.md](suse-0.33.2/README.md).
 
 ## Evidencia y alcance
 
@@ -26,23 +28,37 @@ operaciones, conservando el tipo de clave esperado y el resto de la lógica.
 Este parche mínimo es una propuesta local; no se presenta como parche oficial
 de SUSE ni como sustituto de todas las correcciones posteriores de GNOME.
 
-## Preparación pendiente
+## Compilación fuera del POS
 
-Antes de compilar, comprobar las herramientas de construcción y las cabeceras
-de las dependencias mediante `pkg-config`. Tener las bibliotecas de ejecución
-resueltas por `ldd` no garantiza que estén las cabeceras para compilar.
+El equipo del cliente carece de compilador y no encuentra las cabeceras de
+desarrollo con `pkg-config`. No necesita instalarlas para ejecutar la copia
+precompilada. Tener las bibliotecas de ejecución resueltas por `ldd` no implica
+tener las cabeceras para compilar.
 
-Construir sólo en un directorio nuevo dentro de `$HOME/pos-atk-prueba`, con la
-ruta explícita al JDK 8 existente. Conservar intactos el puente extraído y el JRE.
-No ejecutar `make install`, no usar `sudo` y no cambiar paquetes, alternativas
-Java ni propiedades globales de accesibilidad. Si faltan herramientas, revisar
-las opciones antes de instalar nada.
+El workflow `build-atk-bridge.yml` instala herramientas únicamente en el runner
+efímero de GitHub. Construye con Ubuntu 22.04 x86_64 y Temurin Java 8, sin
+`make install`. Los scripts de compilación/prueba de CI no deben ejecutarse en
+el equipo del POS. La JVM de compilación no se incluye en la descarga.
 
-La fuente exacta del paquete de SUSE y sus parches deben revisarse antes de
-sustituir su biblioteca por una reconstrucción. Aplicar el parche a una copia
-de fuentes, nunca editar bytes del `.so` usando posiciones del desensamblado.
+En el cliente, usar sólo el lanzador `probar.sh` del ZIP experimental, con la
+ruta explícita a su JDK 8u191. Conservar intactos el puente extraído y el JRE.
+No usar `sudo` ni cambiar paquetes, alternativas Java o propiedades globales
+de accesibilidad. El lanzador comprueba hashes y dependencias antes de abrir
+la ventana de ejemplo.
+
+Se revisaron la receta pública de openSUSE Leap 15.6 y sus parches. No es una
+reproducción exacta ni un paquete oficial de SLES 15 SP7; requiere validación en
+destino. El parche se aplica a una copia de fuentes, nunca se editan bytes del
+`.so` usando posiciones del desensamblado.
 
 ## Validación necesaria
+
+En [CI](https://github.com/robertoflovan/TestAutoLinux/actions/runs/40791886977),
+el original reprodujo el SIGSEGV tras una lectura correcta; el corregido
+superó seis consultas (125.50 y 80.00), sobrevivió a las desconexiones y a una
+espera final de 10 segundos. El entorno fue Ubuntu 22.04 / Temurin 8u504.
+La [descarga experimental](../experimental/README.md) queda pendiente de
+validación en SLES 15 SP7 / Oracle 8u191.
 
 Probar primero el control Swing con la copia corregida: esperar sin consultas,
 validar el total inicial, comprobar que sigue vivo después de desconectarse el
