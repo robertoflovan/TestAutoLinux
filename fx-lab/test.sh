@@ -6,6 +6,7 @@ ulimit -c 0
 task_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 task_build="$task_root/target/fx-lab-build"
 task_kit="$task_build/fx-lab-v1"
+task_agent="${POS_FX_TEST_AGENT:-$task_kit/fx-inspector.jar}"
 task_logs="$task_build/test-logs"
 mkdir -p "$task_logs"
 openbox > "$task_logs/window-manager.log" 2>&1 &
@@ -18,7 +19,7 @@ trap 'cleanup; kill "$task_wm" 2>/dev/null || true' EXIT
 sleep 2
 launch() {
     task_session="$(mktemp -d "$task_logs/session-XXXXXXXX")"
-    java -Djavax.accessibility.assistive_technologies= "-javaagent:$task_kit/fx-inspector.jar=$task_session" -jar "$task_kit/fx-demo.jar" > "$task_session/demo.log" 2>&1 &
+    java -Djavax.accessibility.assistive_technologies= "-javaagent:$task_agent=$task_session" -jar "$task_kit/fx-demo.jar" > "$task_session/demo.log" 2>&1 &
     task_pid=$!
     task_window="$(timeout 30 xdotool search --sync --onlyvisible --pid "$task_pid" --name 'POS - Prueba JavaFX Inspector' | head -n1)"
     sleep 2

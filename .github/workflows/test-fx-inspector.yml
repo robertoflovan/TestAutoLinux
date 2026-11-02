@@ -20,14 +20,22 @@ jobs:
           sudo apt-get install -y --no-install-recommends libgtk2.0-0 libgtk-3-0 libxtst6 libxrender1 libxi6 fonts-dejavu-core xvfb xauth xdotool openbox dbus-x11
       - name: Compile Java 8 agent and demo
         run: bash fx-lab/build.sh
+      - name: Test option selectors and client protocol
+        run: |
+          javac -encoding UTF-8 -cp target/fx-lab-build/classes -d target/fx-lab-build/classes fx-lab/tests/mx/demo/posfx/FxOptionCheckTest.java
+          java -cp target/fx-lab-build/classes mx.demo.posfx.FxOptionCheckTest
       - name: Exercise real JavaFX controls and reader lifecycle
-        run: dbus-run-session -- xvfb-run -a -s '-screen 0 1280x800x24 -noreset' bash fx-lab/test.sh
+        run: |
+          unzip -q experimental/fx-lab-v1.1.zip -d target/fx-legacy
+          export POS_FX_TEST_AGENT="$PWD/target/fx-legacy/fx-lab-v1/fx-inspector.jar"
+          dbus-run-session -- xvfb-run -a -s '-screen 0 1280x800x24 -noreset' bash fx-lab/test.sh
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: fx-inspector-lab
           path: |
             target/fx-lab-build/fx-lab-v1/
+            target/fx-lab-build/fx-reader-v1.2/
             target/fx-lab-build/test-logs/
           if-no-files-found: error
           retention-days: 30
