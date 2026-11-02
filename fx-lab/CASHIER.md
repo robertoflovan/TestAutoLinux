@@ -11,6 +11,12 @@ y `logs/output.log`. Añade el inspector JavaFX y desactiva la propiedad del
 puente ATK para ese proceso. Usa exactamente el Java 8u191 ya instalado.
 Los originales se leen y no se modifican.
 
+[Verificación con scripts y Java simulados](https://github.com/robertoflovan/TestAutoLinux/actions/runs/41508579829):
+preparación sin ejecutar cierres, secuencia de reinicio conservada, argumentos
+y rutas originales conservados, agente añadido, sesión del ejemplo separada y
+rechazo de un lanzador ambiguo antes del cierre. Esta prueba no ejecuta CASHIER
+ni comprueba aún la convivencia real del inspector con AspectJ dentro del POS.
+
 ## Descargar y preparar
 
 El kit `fx-lab-v1` de la prueba anterior debe seguir en `~/pos-fx-prueba`.

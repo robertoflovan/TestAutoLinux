@@ -64,6 +64,9 @@ que funcionen los controles propios de CASHIER ni su combinación con AspectJ.
 Después de validar aquí, se puede preparar un arranque del POS que conserve
 su Java y sus argumentos y añada este agente, sin el puente ATK.
 
+Una vez validado el ejemplo, la [guía de CASHIER](CASHIER.md) describe la
+preparación y el reinicio mediante copias de los lanzadores habituales.
+
 La captura recorre escenas de ventanas abiertas y nodos marcados visibles;
 no determina si otro nodo los tapa ni si están dentro del área recortada.
 Canvas, contenido de WebView y filas virtualizadas pueden necesitar otra vía.

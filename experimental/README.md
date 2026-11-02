@@ -19,8 +19,11 @@ también rechazo de valores incorrectos, ausencia de ID y campos de contraseña;
 el lector no reutiliza respuestas tras cerrar el ejemplo. El ZIP contiene
 `BUILD-INFO.txt`, `BUILD-JAVA.txt`, `TEST-RESULTS.txt` y hashes de sus JAR.
 
-**Pendiente:** ejecutar este ejemplo con SLES 15 SP7 / Oracle 8u191. El paquete
-no incluye un JRE y todavía no inicia ni valida CASHIER con el agente.
+**Validación del usuario:** el ejemplo con tamaño explícito abrió en SLES
+15 SP7 / Oracle 8u191; la lectura de 125.50 y 80.00 dio PASS y la inspección
+mostró 24 nodos sin captura parcial. Sigue pendiente validar CASHIER real.
+La [guía de CASHIER](../fx-lab/CASHIER.md) usa scripts separados para preparar
+su arranque y consultar su propia sesión. El kit no incluye un JRE.
 
 ## Puente ATK corregido: historial de la prueba Swing
 
