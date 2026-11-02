@@ -14,3 +14,4 @@ jobs:
           distribution: temurin
           java-version: '8'
       - run: bash tests/test_prepare_cashier.sh
+      - run: bash tests/test_restart_cashier.sh
