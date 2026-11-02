@@ -331,6 +331,24 @@ Pendiente: arranque del POS real y lectura de sus controles.
 
 ## Reinicio habitual de GEOPOS con el puente (Colombia)
 
+**Resultado de la prueba real:** CASHIER usa interfaz configurada `jfx` y
+terminó con SIGSEGV durante el arranque con el puente. El log confirma la
+carga del `.so` corregido y una pila con `PlatformImpl`, `libglass.so`, GDK y
+`libjvm.so`. Es un fallo distinto de `g_int_hash`; no hay todavía diagnóstico
+definitivo del origen. No repetir este lanzador en el POS para diagnosticarlo;
+usar primero una reproducción aislada de JavaFX. Mantener el arranque normal
+sin ATK para recuperar el funcionamiento del cliente. Las instrucciones de
+esta sección se conservan como referencia de la prueba efectuada.
+
+Java ATK Wrapper está diseñado para adaptar accesibilidad Swing a ATK
+([GNOME](https://github.com/GNOME/java-atk-wrapper)). Oracle documentó la
+accesibilidad JavaFX 8u40 para Windows y Mac, sin incluir Linux
+([notas de versión](https://www.oracle.com/java/technologies/javase/8u40-relnotes.html)).
+Investigar la lectura del árbol de escenas JavaFX dentro de su JVM, conservando
+Java 8u191 y validando antes un inspector separado, es una alternativa a
+seguir cargando ATK. No equivale a garantizar que todos los controles sean
+legibles ni que un agente pueda añadirse sin pruebas de integración.
+
 Alternativa al lanzador anterior que rechazaba un POS abierto:
 `scripts/restart-cashier-atk.sh`. El usuario confirmó que el procedimiento
 diario reinicia a través de `iniciaGeopos.sh` y `runPos.sh`, incluidos sus

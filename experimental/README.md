@@ -1,5 +1,13 @@
 # Puente corregido: descarga experimental
 
+**Resultado posterior en CASHIER Colombia:** el POS configurado con interfaz
+JavaFX terminó durante el arranque con SIGSEGV en `libjvm.so`, después de cargar
+este puente. No repetir el arranque del POS real con ATK hasta investigar esa
+interacción en una aplicación JavaFX aislada. La corrección del defecto
+`g_int_hash` sigue validada en el ejemplo Swing; no acredita compatibilidad
+con JavaFX. Los originales del cliente permanecen intactos y permiten el
+arranque habitual sin el puente.
+
 `puente-corregido-v1.zip` contiene Java ATK Wrapper 0.33.2 reconstruido con la
 corrección de claves de eventos. No contiene un JRE ni instala paquetes.
 
