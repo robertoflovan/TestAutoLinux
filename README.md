@@ -289,6 +289,46 @@ Java ATK Wrapper 0.33.2, hay una [copia corregida experimental](experimental/REA
 con instrucciones para probarla sin instalar compiladores ni cambiar Java.
 Su validación en CI no sustituye la prueba en el Linux del cliente.
 
+## Preparar CASHIER Colombia sin reiniciarlo
+
+`scripts/prepare-cashier-atk.sh PID` lee los argumentos y determinadas variables
+de entorno del CASHIER abierto en la misma sesión. Está limitado a la instalación
+Colombia 2.0.0.2.101 y al ejecutable `/usr/java/jdk1.8.0_191/bin/java`. Requiere
+el puente corregido v1 ya probado con el ejemplo. No ejecuta `iniciaGeopos.sh`,
+`runPos.sh` o `terminatePos.sh`, que pueden cerrar procesos.
+
+```bash
+bash scripts/prepare-cashier-atk.sh 12345
+```
+
+Sustituir 12345 por el PID actual de CASHIER. Crea una carpeta privada nueva
+`$HOME/pos-atk-prueba/cashier-plan-...` con `configuracion.txt` para revisar e
+`iniciar-prueba.sh`. La preparación no inicia ni termina el POS. No publicar
+los planes del cliente en GitHub: pueden contener argumentos internos.
+
+El futuro lanzador conserva los argumentos activos (incluidos AspectJ, heap,
+classpath, configuración y zona horaria) y añade el JAR y la propiedad de
+accesibilidad. Preserva LD_LIBRARY_PATH agregando el puente. Copia sólo
+GEOPOS_HOME, JRE_HOME, PATH, LANG, LC_ALL, LC_CTYPE y TZ cuando están presentes;
+el resto del entorno proviene de la terminal que lo ejecute. La sesión gráfica
+debe ser la misma. Si se necesitan otras variables, revisar antes de iniciar.
+
+El archivo generado no inicia nada por defecto. Su opción explícita `--iniciar`
+se utiliza sólo después de revisar el plan y cerrar CASHIER normalmente en el
+momento de la prueba. Rechaza un POS todavía abierto; no lo cierra. Comprueba
+host, instalación current e integridad del puente. Ejecuta en primer plano,
+con un log separado `cashier.log` en el plan. Mantener la terminal abierta.
+Una vuelta al arranque habitual usa los scripts originales intactos, después
+de cerrar normalmente la instancia de prueba.
+
+El plan es una captura de los argumentos activos, no vuelve a interpretar
+customization.properties. Si cambian la instalación o la configuración de
+arranque, preparar un plan nuevo desde una instancia normal actualizada.
+
+Validación automatizada de preparación y guardas:
+[CI con un proceso Java ficticio](https://github.com/robertoflovan/TestAutoLinux/actions/runs/41483886378).
+Pendiente: arranque del POS real y lectura de sus controles.
+
 ## Límites y códigos de salida
 
 Valores por defecto por captura: 2,000 elementos, profundidad 25, 2,000 caracteres por campo, timeout total 45 segundos, timeout de consulta AT-SPI 800 ms. Ejemplo para ampliar:
