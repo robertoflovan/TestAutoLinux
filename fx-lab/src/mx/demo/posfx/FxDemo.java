@@ -25,7 +25,13 @@ public final class FxDemo extends Application {
         pane.addRow(2, new Label("Total:"), total);
         pane.addRow(3, new Label("Clave ficticia (no leer):"), password);
         pane.addRow(4, new Label("Escribe codigo y pulsa Enter"), button);
-        stage.setTitle("POS - Prueba JavaFX Inspector"); stage.setScene(new Scene(pane)); stage.show(); code.requestFocus();
+        // Avoid relying on an automatic initial size on older JavaFX/window managers.
+        stage.setTitle("POS - Prueba JavaFX Inspector");
+        stage.setScene(new Scene(pane, 640, 360));
+        stage.setMinWidth(600); stage.setMinHeight(320);
+        stage.show(); stage.centerOnScreen(); code.requestFocus();
+        System.out.println("Ejemplo JavaFX abierto: " + stage.getWidth() + " x " + stage.getHeight()
+                + " en x=" + stage.getX() + ", y=" + stage.getY());
     }
     public static void main(String[] args) { launch(args); }
 }
