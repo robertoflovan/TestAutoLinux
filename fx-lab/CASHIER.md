@@ -54,6 +54,15 @@ el ID `TotalVenta`: el reporte del POS mostrará sus tipos, IDs y textos reales.
 Si indica captura parcial, aún no se puede validar un valor con `check`.
 Revisa los datos del cliente antes de compartir el reporte.
 
+## Validar una opción numerada sin ID propio
+
+El [lector separado 1.2](reader/README.md) añade `check-option CONTENEDOR NUMERO TEXTO`.
+Puede usarse con el agente ya cargado: se descarga en otra carpeta y no requiere
+reiniciar CASHIER. Para la sección `hBoxFavorite`, la opción identificada por
+`[2]` se busca dentro de su tarjeta, aunque cambie el orden de las tarjetas.
+Una búsqueda ambigua falla, en lugar de elegir la primera etiqueta encontrada.
+El texto esperado se compara exactamente, incluyendo abreviaturas y puntos.
+
 El arranque y la lectura aún requieren validación en CASHIER real. Si la
 ventana no abre o se cierra, conserva la salida y las últimas líneas de
 `~/geopos/current/logs/output.log` antes de otro arranque, que puede reemplazarlas.

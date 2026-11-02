@@ -1,5 +1,17 @@
 # Descargas experimentales
 
+## Lector 1.2: validar opciones numeradas en CASHIER
+
+[`fx-reader-v1.2.zip`](fx-reader-v1.2.zip) añade `check-option` para localizar
+una opción por su número dentro de una sección y comparar su etiqueta exacta.
+Es un lector separado: usa el agente de CASHIER que ya está abierto, sin
+reemplazarlo ni reiniciar el POS. [Instrucciones](../fx-lab/reader/README.md).
+
+[CI verificado](https://github.com/robertoflovan/TestAutoLinux/actions/runs/41511784872):
+selectores con menús sintéticos, casos ambiguos y diferencias de texto;
+lecturas de una ventana JavaFX real con el agente sin cambios del kit 1.1.
+La validación en vivo de esta opción concreta del POS queda pendiente.
+
 ## JavaFX: siguiente prueba aislada
 
 [`fx-lab-v1.1.zip`](fx-lab-v1.1.zip) incluye un inspector mediante agente Java 8,
