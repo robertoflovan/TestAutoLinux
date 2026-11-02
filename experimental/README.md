@@ -2,10 +2,15 @@
 
 ## JavaFX: siguiente prueba aislada
 
-[`fx-lab-v1.zip`](fx-lab-v1.zip) incluye un inspector mediante agente Java 8,
+[`fx-lab-v1.1.zip`](fx-lab-v1.1.zip) incluye un inspector mediante agente Java 8,
 un ejemplo JavaFX, fuentes y lanzadores para usar el Oracle 8u191 ya existente.
 La [guía paso a paso](../fx-lab/README.md) permite probar lectura de controles y
 validación del total sin cargar ATK y sin cerrar CASHIER.
+
+La revisión 1.1 mantiene la carpeta `fx-lab-v1` y agrega tamaño explícito,
+tamaño mínimo, centrado y diagnóstico de dimensiones a la ventana del ejemplo.
+Se repitieron las [pruebas gráficas con éxito](https://github.com/robertoflovan/TestAutoLinux/actions/runs/41505196210).
+Su efecto sobre la ventana diminuta observada en SLES aún debe comprobarse allí.
 
 [Prueba de CI completada](https://github.com/robertoflovan/TestAutoLinux/actions/runs/41502527663)
 con Ubuntu 22.04 y Liberica 8u513 + JavaFX: lectura repetida de 125.50 y 80.00,

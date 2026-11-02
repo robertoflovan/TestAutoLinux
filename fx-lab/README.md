@@ -13,8 +13,8 @@ gráfica, sin sudo. No ejecutes los lanzadores anteriores del puente ATK.
 
 ```bash
 mkdir -p "$HOME/pos-fx-prueba"
-curl --fail --location https://raw.githubusercontent.com/robertoflovan/TestAutoLinux/main/experimental/fx-lab-v1.zip --output "$HOME/pos-fx-prueba/fx-lab-v1.zip"
-unzip "$HOME/pos-fx-prueba/fx-lab-v1.zip" -d "$HOME/pos-fx-prueba"
+curl --fail --location https://raw.githubusercontent.com/robertoflovan/TestAutoLinux/main/experimental/fx-lab-v1.1.zip --output "$HOME/pos-fx-prueba/fx-lab-v1.1.zip"
+unzip -o "$HOME/pos-fx-prueba/fx-lab-v1.1.zip" -d "$HOME/pos-fx-prueba"
 bash "$HOME/pos-fx-prueba/fx-lab-v1/probar.sh"
 ```
 
@@ -22,6 +22,13 @@ bash "$HOME/pos-fx-prueba/fx-lab-v1/probar.sh"
 versión y los hashes, y abre **POS - Prueba JavaFX Inspector**. No instala
 paquetes, cambia Java, cierra CASHIER ni modifica sus scripts. Deja esa terminal
 abierta. Si el ejemplo no abre, conserva el error; no instales otro Java.
+
+La revisión 1.1 conserva la carpeta `fx-lab-v1`, establece un área inicial de
+640 × 360 y un tamaño mínimo, centra la ventana y escribe sus dimensiones al
+abrirla. Es una prueba para el caso de una ventana diminuta; no acredita por sí
+sola la causa del problema de visualización en SLES. Antes de actualizar, detén
+el ejemplo con Ctrl+C en la terminal donde ejecutaste `probar.sh`; CASHIER
+puede permanecer abierto. `unzip -o` reemplaza sólo los archivos del kit.
 
 En **otra terminal**, lee el total inicial:
 
