@@ -329,6 +329,47 @@ Validación automatizada de preparación y guardas:
 [CI con un proceso Java ficticio](https://github.com/robertoflovan/TestAutoLinux/actions/runs/41483886378).
 Pendiente: arranque del POS real y lectura de sus controles.
 
+## Reinicio habitual de GEOPOS con el puente (Colombia)
+
+Alternativa al lanzador anterior que rechazaba un POS abierto:
+`scripts/restart-cashier-atk.sh`. El usuario confirmó que el procedimiento
+diario reinicia a través de `iniciaGeopos.sh` y `runPos.sh`, incluidos sus
+cierres forzados de CASHIER, `callvlc.sh` y VLC. Esta variante conserva esa
+secuencia. No debe interpretarse como un cierre suave o que guarde operaciones
+pendientes; es el procedimiento del proveedor ya revisado.
+
+Está limitada a `QACOL-CERT-VIRREY`, Colombia 2.0.0.2.101 y Java 8u191.
+Primero valida la instalación, versión y selección de Java, integridad del
+puente, dependencias y formato de scripts. Crea copias privadas en una carpeta
+nueva `pos-atk-prueba/reinicio-puente-...`; los originales quedan intactos.
+La copia de inicio llama a la copia de runPos. Esta conserva el cierre habitual,
+configuración, AspectJ, classpath, memoria, zona horaria, ejecución en segundo
+plano y salida a `logs/output.log`. Sólo se fija el mismo ejecutable Java ya
+verificado y se añaden el JAR/propiedad del puente y su ruta nativa al entorno.
+
+```bash
+# Sólo preparar las copias y cambios.txt; no cerrar ni abrir aplicaciones:
+bash scripts/restart-cashier-atk.sh --preparar
+
+# Cuando se vaya a reiniciar el POS para la prueba:
+bash scripts/restart-cashier-atk.sh --iniciar
+```
+
+`--iniciar` vuelve a preparar y validar desde los scripts vigentes, luego
+ejecuta la cadena de reinicio copiada. No requiere cerrar previamente con la X
+ni terminar manualmente un PID. No pulsar a la vez el icono GEOPOS: sería otro
+reinicio normal independiente, sin el puente.
+
+Si el proceso no abre, revisar `tail -n 80 "$HOME/geopos/current/logs/output.log"`.
+Si abre, obtener su PID nuevo con `xprop _NET_WM_PID WM_NAME`, haciendo clic en
+CASHIER, y ejecutar `inspect --backend jna --pid PID --out reports/cashier-reinicio-puente`
+desde el laboratorio. Comprobar lectura y supervivencia después de consultar.
+
+[Pruebas de secuencia, preservación de argumentos y rechazo antes del cierre](https://github.com/robertoflovan/TestAutoLinux/actions/runs/41490737847)
+usan scripts ficticios. El funcionamiento del POS real con el puente sigue
+pendiente de validación en el equipo cliente. No se suben scripts ni planes
+del cliente al repositorio.
+
 ## Límites y códigos de salida
 
 Valores por defecto por captura: 2,000 elementos, profundidad 25, 2,000 caracteres por campo, timeout total 45 segundos, timeout de consulta AT-SPI 800 ms. Ejemplo para ampliar:
