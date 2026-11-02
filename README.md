@@ -6,6 +6,11 @@ Si ya descargaste la versión anterior (que requería Java 17), actualiza con `g
 
 La finalidad es obtener evidencia: ¿aparece el proceso?, ¿hay controles dentro de la ventana?, ¿se puede leer el contenido del producto/total/mensajes?, ¿cambia al operar manualmente?, ¿puede localizarse sin coordenadas?
 
+**Vía JavaFX independiente de ATK:** [ejemplo e inspector Java 8](fx-lab/README.md).
+Este experimento lee directamente el árbol de escenas mediante un agente Java,
+sin instalar paquetes ni cambiar el Java del cliente. Primero se valida en su
+propia ventana de ejemplo; todavía no está validado en CASHIER.
+
 ## Descargar desde GitHub en el equipo Linux
 
 El repositorio incluye **`pos-accessibility-lab.jar` ya compilado**. No necesitas Maven para ejecutarlo. Desde una terminal de tu escritorio, puedes descargarlo a tu carpeta personal:
