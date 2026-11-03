@@ -7,7 +7,7 @@ Ejecuta explícitamente el Java 8u191 existente. No contiene un agente ni JavaFX
 ```bash
 curl --fail --location https://raw.githubusercontent.com/robertoflovan/TestAutoLinux/main/experimental/fx-reader-v1.2.zip --output "$HOME/pos-fx-prueba/fx-reader-v1.2.zip"
 unzip "$HOME/pos-fx-prueba/fx-reader-v1.2.zip" -d "$HOME/pos-fx-prueba"
-bash "$HOME/pos-fx-prueba/fx-reader-v1.2/leer-cashier.sh" check-option hBoxFavorite 2 "Devoluciones..."
+bash "$HOME/pos-fx-prueba/fx-reader-v1.2/leer-cashier.sh" check-option hBoxFavorite 2 "Devolucion..."
 ```
 
 El comando busca el contenedor por ID, la etiqueta `[2]` en una tarjeta hija

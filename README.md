@@ -1,15 +1,14 @@
-# Laboratorio de accesibilidad para un punto de venta en Linux
+# Validación de puntos de venta en Linux
+
+**Para CASHIER / GEOPOS con interfaz JavaFX, empieza por la [guía operativa para Colombia y nuevos ambientes](fx-lab/CASHIER.md).** Incluye la ambientación reproducible, la lectura por ID y por opción, los resultados en SLES 15 SP7 con Oracle 8u191 y la ficha de adaptación para Perú.
+
+## Laboratorio AT-SPI para investigar una aplicación desconocida
 
 Proyecto compatible con **Java 8 (1.8) o superior**, desde la versión **1.1.0**, para averiguar si un POS expone **elementos, etiquetas, texto y valores**, antes de automatizar su teclado. No necesitas conocer todavía la tecnología de la aplicación. El ZIP portable incluye el JAR compilado y el código; **Linux no necesita Maven ni Internet para ejecutar el JAR** una vez instaladas las dependencias del sistema.
 
 Si ya descargaste la versión anterior (que requería Java 17), actualiza con `git pull --ff-only` desde la carpeta del repositorio o descarga el ZIP otra vez. `bash run.sh help` debe mostrar **1.1.1 · Java 8 (1.8)+**. No hace falta cambiar el Java del equipo ni el que utiliza el POS.
 
 La finalidad es obtener evidencia: ¿aparece el proceso?, ¿hay controles dentro de la ventana?, ¿se puede leer el contenido del producto/total/mensajes?, ¿cambia al operar manualmente?, ¿puede localizarse sin coordenadas?
-
-**Vía JavaFX independiente de ATK:** [ejemplo e inspector Java 8](fx-lab/README.md).
-Este experimento lee directamente el árbol de escenas mediante un agente Java,
-sin instalar paquetes ni cambiar el Java del cliente. Primero se valida en su
-propia ventana de ejemplo; todavía no está validado en CASHIER.
 
 ## Descargar desde GitHub en el equipo Linux
 
@@ -77,7 +76,7 @@ No necesitas dar permiso de ejecución al script: usa `bash run.sh`. También pu
 
 ### SUSE Linux Enterprise Server 15 SP7 (SLES 15.7)
 
-El proyecto no está limitado a Ubuntu: la vía JNA detecta Linux y carga las bibliotecas AT-SPI del sistema. **SLES 15 SP7 es un destino posible, pero no se ha probado este laboratorio en una instalación SLES real.** La lectura del POS depende de su accesibilidad y de la sesión, no sólo de la distribución.
+El proyecto no está limitado a Ubuntu: la vía JNA detecta Linux y carga las bibliotecas AT-SPI del sistema. En SLES 15 SP7 el laboratorio enumeró aplicaciones del escritorio. CASHIER se pudo leer posteriormente con el agente JavaFX. La lectura del POS depende de su accesibilidad y de la sesión, no sólo de la distribución.
 
 En SUSE se utiliza `zypper`, no los comandos `apt-get` del ejemplo anterior. **Java 1.8 existente es suficiente para la versión 1.1.0 del laboratorio; no es necesario instalar Java 17/21.** Los paquetes de accesibilidad se llaman `at-spi2-core` y `libatspi0`; no `libatspi2.0-0` como en Debian/Ubuntu. Su disponibilidad en el equipo depende de los módulos y repositorios habilitados.
 
@@ -294,104 +293,11 @@ Java ATK Wrapper 0.33.2, hay una [copia corregida experimental](experimental/REA
 con instrucciones para probarla sin instalar compiladores ni cambiar Java.
 Su validación en CI no sustituye la prueba en el Linux del cliente.
 
-## Preparar CASHIER Colombia sin reiniciarlo
+## Historial del puente ATK en CASHIER Colombia
 
-`scripts/prepare-cashier-atk.sh PID` lee los argumentos y determinadas variables
-de entorno del CASHIER abierto en la misma sesión. Está limitado a la instalación
-Colombia 2.0.0.2.101 y al ejecutable `/usr/java/jdk1.8.0_191/bin/java`. Requiere
-el puente corregido v1 ya probado con el ejemplo. No ejecuta `iniciaGeopos.sh`,
-`runPos.sh` o `terminatePos.sh`, que pueden cerrar procesos.
+Las pruebas de preparación y reinicio con ATK se conservan en el historial técnico del proyecto. Al cargar el puente corregido en el POS JavaFX, CASHIER terminó durante el arranque con SIGSEGV. El control Swing sí permitió leer ambos totales con el puente corregido. Los scripts de esa investigación se identifican por el sufijo `-atk.sh`. [Resultados del puente](experimental/README.md)
 
-```bash
-bash scripts/prepare-cashier-atk.sh 12345
-```
-
-Sustituir 12345 por el PID actual de CASHIER. Crea una carpeta privada nueva
-`$HOME/pos-atk-prueba/cashier-plan-...` con `configuracion.txt` para revisar e
-`iniciar-prueba.sh`. La preparación no inicia ni termina el POS. No publicar
-los planes del cliente en GitHub: pueden contener argumentos internos.
-
-El futuro lanzador conserva los argumentos activos (incluidos AspectJ, heap,
-classpath, configuración y zona horaria) y añade el JAR y la propiedad de
-accesibilidad. Preserva LD_LIBRARY_PATH agregando el puente. Copia sólo
-GEOPOS_HOME, JRE_HOME, PATH, LANG, LC_ALL, LC_CTYPE y TZ cuando están presentes;
-el resto del entorno proviene de la terminal que lo ejecute. La sesión gráfica
-debe ser la misma. Si se necesitan otras variables, revisar antes de iniciar.
-
-El archivo generado no inicia nada por defecto. Su opción explícita `--iniciar`
-se utiliza sólo después de revisar el plan y cerrar CASHIER normalmente en el
-momento de la prueba. Rechaza un POS todavía abierto; no lo cierra. Comprueba
-host, instalación current e integridad del puente. Ejecuta en primer plano,
-con un log separado `cashier.log` en el plan. Mantener la terminal abierta.
-Una vuelta al arranque habitual usa los scripts originales intactos, después
-de cerrar normalmente la instancia de prueba.
-
-El plan es una captura de los argumentos activos, no vuelve a interpretar
-customization.properties. Si cambian la instalación o la configuración de
-arranque, preparar un plan nuevo desde una instancia normal actualizada.
-
-Validación automatizada de preparación y guardas:
-[CI con un proceso Java ficticio](https://github.com/robertoflovan/TestAutoLinux/actions/runs/41483886378).
-Pendiente: arranque del POS real y lectura de sus controles.
-
-## Reinicio habitual de GEOPOS con el puente (Colombia)
-
-**Resultado de la prueba real:** CASHIER usa interfaz configurada `jfx` y
-terminó con SIGSEGV durante el arranque con el puente. El log confirma la
-carga del `.so` corregido y una pila con `PlatformImpl`, `libglass.so`, GDK y
-`libjvm.so`. Es un fallo distinto de `g_int_hash`; no hay todavía diagnóstico
-definitivo del origen. No repetir este lanzador en el POS para diagnosticarlo;
-usar primero una reproducción aislada de JavaFX. Mantener el arranque normal
-sin ATK para recuperar el funcionamiento del cliente. Las instrucciones de
-esta sección se conservan como referencia de la prueba efectuada.
-
-Java ATK Wrapper está diseñado para adaptar accesibilidad Swing a ATK
-([GNOME](https://github.com/GNOME/java-atk-wrapper)). Oracle documentó la
-accesibilidad JavaFX 8u40 para Windows y Mac, sin incluir Linux
-([notas de versión](https://www.oracle.com/java/technologies/javase/8u40-relnotes.html)).
-Investigar la lectura del árbol de escenas JavaFX dentro de su JVM, conservando
-Java 8u191 y validando antes un inspector separado, es una alternativa a
-seguir cargando ATK. No equivale a garantizar que todos los controles sean
-legibles ni que un agente pueda añadirse sin pruebas de integración.
-
-Alternativa al lanzador anterior que rechazaba un POS abierto:
-`scripts/restart-cashier-atk.sh`. El usuario confirmó que el procedimiento
-diario reinicia a través de `iniciaGeopos.sh` y `runPos.sh`, incluidos sus
-cierres forzados de CASHIER, `callvlc.sh` y VLC. Esta variante conserva esa
-secuencia. No debe interpretarse como un cierre suave o que guarde operaciones
-pendientes; es el procedimiento del proveedor ya revisado.
-
-Está limitada a `QACOL-CERT-VIRREY`, Colombia 2.0.0.2.101 y Java 8u191.
-Primero valida la instalación, versión y selección de Java, integridad del
-puente, dependencias y formato de scripts. Crea copias privadas en una carpeta
-nueva `pos-atk-prueba/reinicio-puente-...`; los originales quedan intactos.
-La copia de inicio llama a la copia de runPos. Esta conserva el cierre habitual,
-configuración, AspectJ, classpath, memoria, zona horaria, ejecución en segundo
-plano y salida a `logs/output.log`. Sólo se fija el mismo ejecutable Java ya
-verificado y se añaden el JAR/propiedad del puente y su ruta nativa al entorno.
-
-```bash
-# Sólo preparar las copias y cambios.txt; no cerrar ni abrir aplicaciones:
-bash scripts/restart-cashier-atk.sh --preparar
-
-# Cuando se vaya a reiniciar el POS para la prueba:
-bash scripts/restart-cashier-atk.sh --iniciar
-```
-
-`--iniciar` vuelve a preparar y validar desde los scripts vigentes, luego
-ejecuta la cadena de reinicio copiada. No requiere cerrar previamente con la X
-ni terminar manualmente un PID. No pulsar a la vez el icono GEOPOS: sería otro
-reinicio normal independiente, sin el puente.
-
-Si el proceso no abre, revisar `tail -n 80 "$HOME/geopos/current/logs/output.log"`.
-Si abre, obtener su PID nuevo con `xprop _NET_WM_PID WM_NAME`, haciendo clic en
-CASHIER, y ejecutar `inspect --backend jna --pid PID --out reports/cashier-reinicio-puente`
-desde el laboratorio. Comprobar lectura y supervivencia después de consultar.
-
-[Pruebas de secuencia, preservación de argumentos y rechazo antes del cierre](https://github.com/robertoflovan/TestAutoLinux/actions/runs/41490737847)
-usan scripts ficticios. El funcionamiento del POS real con el puente sigue
-pendiente de validación en el equipo cliente. No se suben scripts ni planes
-del cliente al repositorio.
+En la caja de Colombia se pasó después al agente JavaFX. El POS abrió con el Java habitual y se comprobaron campos reales. Para repetir esa intervención utiliza el lanzador `restart-cashier-fx.sh` y el lector 1.2 siguiendo la [guía de CASHIER](fx-lab/CASHIER.md).
 
 ## Límites y códigos de salida
 

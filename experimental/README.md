@@ -10,7 +10,7 @@ reemplazarlo ni reiniciar el POS. [Instrucciones](../fx-lab/reader/README.md).
 [CI verificado](https://github.com/robertoflovan/TestAutoLinux/actions/runs/41511784872):
 selectores con menús sintéticos, casos ambiguos y diferencias de texto;
 lecturas de una ventana JavaFX real con el agente sin cambios del kit 1.1.
-La validación en vivo de esta opción concreta del POS queda pendiente.
+En CASHIER Colombia el lector devolvió `PASS` para `hBoxFavorite`, opción `[2]`, con el texto exacto `Devolucion...`.
 
 ## JavaFX: siguiente prueba aislada
 
@@ -22,7 +22,7 @@ validación del total sin cargar ATK y sin cerrar CASHIER.
 La revisión 1.1 mantiene la carpeta `fx-lab-v1` y agrega tamaño explícito,
 tamaño mínimo, centrado y diagnóstico de dimensiones a la ventana del ejemplo.
 Se repitieron las [pruebas gráficas con éxito](https://github.com/robertoflovan/TestAutoLinux/actions/runs/41505196210).
-Su efecto sobre la ventana diminuta observada en SLES aún debe comprobarse allí.
+En SLES el operador confirmó que la ventana de esta revisión se veía correctamente.
 
 [Prueba de CI completada](https://github.com/robertoflovan/TestAutoLinux/actions/runs/41502527663)
 con Ubuntu 22.04 y Liberica 8u513 + JavaFX: lectura repetida de 125.50 y 80.00,
@@ -33,7 +33,7 @@ el lector no reutiliza respuestas tras cerrar el ejemplo. El ZIP contiene
 
 **Validación del usuario:** el ejemplo con tamaño explícito abrió en SLES
 15 SP7 / Oracle 8u191; la lectura de 125.50 y 80.00 dio PASS y la inspección
-mostró 24 nodos sin captura parcial. Sigue pendiente validar CASHIER real.
+mostró 24 nodos sin captura parcial. En el menú del POS real se obtuvo una captura de dos ventanas y 163 nodos y se validaron el título, la versión y una opción.
 La [guía de CASHIER](../fx-lab/CASHIER.md) usa scripts separados para preparar
 su arranque y consultar su propia sesión. El kit no incluye un JRE.
 

@@ -59,13 +59,7 @@ reutiliza resultados anteriores si la aplicación ya terminó.
 
 ## Alcance y siguiente paso
 
-Este paquete **sólo lanza el ejemplo**. Leerlo correctamente no demuestra aún
-que funcionen los controles propios de CASHIER ni su combinación con AspectJ.
-Después de validar aquí, se puede preparar un arranque del POS que conserve
-su Java y sus argumentos y añada este agente, sin el puente ATK.
-
-Una vez validado el ejemplo, la [guía de CASHIER](CASHIER.md) describe la
-preparación y el reinicio mediante copias de los lanzadores habituales.
+La demo comprueba el escritorio y el Java existentes. En Colombia se obtuvieron los dos totales y la ventana siguió abierta. En el POS real se comprobó por separado el menú principal, incluida la opción numerada `[2]`. El procedimiento y la adaptación para otros equipos están en la [guía de CASHIER](CASHIER.md).
 
 La captura recorre escenas de ventanas abiertas y nodos marcados visibles;
 no determina si otro nodo los tapa ni si están dentro del área recortada.
@@ -82,7 +76,7 @@ límite cooperativo: una llamada de un control que se bloquee no puede ser
 interrumpida de forma segura. Una captura pendiente evita encolar más lecturas.
 
 En JavaFX 8 la enumeración de ventanas usa `Window.impl_getWindows`, una API
-interna y obsoleta. Por eso es necesaria la prueba en Oracle 8u191. El resto de
+interna y obsoleta. Conviene repetir la demo en cada distribución del runtime. El resto de
 la lectura usa las APIs de controles y escenas. El agente es experimental y
 su presencia y consultas añaden trabajo al proceso.
 
@@ -98,8 +92,7 @@ bash fx-lab/build.sh
 El workflow `test-fx-inspector.yml` compila y ejecuta el ejemplo con Java 8 y
 JavaFX en un Linux desechable. Prueba lectura repetida, cambio real por teclado,
 rechazo de valores incorrectos y contraseñas, desconexiones del lector y
-ausencia de respuestas antiguas después del cierre. Esa prueba no sustituye
-la validación pendiente en SLES 15 SP7 / Oracle 8u191. El ZIP no incluye un JRE.
+ausencia de respuestas antiguas después del cierre. La demo también se validó en la caja SLES 15 SP7 con Oracle 8u191. El ZIP no incluye un JRE.
 
 Documentación: [agentes Java 8](https://docs.oracle.com/javase/8/docs/api/java/lang/instrument/package-summary.html),
 [Platform.runLater](https://docs.oracle.com/javase/8/javafx/api/javafx/application/Platform.html),
